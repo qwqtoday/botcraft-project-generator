@@ -114,3 +114,18 @@ subprocess.Popen(
     ["git", "submodule", "add", "https://github.com/adepierre/Botcraft", "3rdparty/Botcraft"],
     cwd=project_path
 ).wait()
+
+os.mkdir("cmake")
+
+with open(os.path.join(project_path, "cmake", "botcraft.cmake"), "w") as f:
+    f.write("""# Check if Botcraft folder is empty and clone submodule if needed
+file(GLOB RESULT "3rdparty/Botcraft/botcraft/include")
+list(LENGTH RESULT RES_LEN)
+if(RES_LEN EQUAL 0)
+    message(STATUS "Botcraft not found, cloning it...")
+    execute_process(COMMAND git submodule update --init -- 3rdparty/Botcraft WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
+
+set(BOTCRAFT_BUILD_EXAMPLES OFF CACHE BOOL "")
+
+add_subdirectory("3rdparty/Botcraft")""")
